@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Ticket Submission</title>
+</head>
+<body>
+    <h1>Ticket Submission</h1>
+    <form method="POST" action="/">
+        <!-- Dropdown für die Kategorie-Auswahl -->
+        <label for="chosen_category">Select Category:</label><br />
+        <select id="chosen_category" name="chosen_category">
+            {% for cat in categories %}
+                <option value="{{ cat }}"
+                    {% if cat == chosen_category %} selected {% endif %}>
+                    {{ cat }}
+                </option>
+            {% endfor %}
+        </select>
+        <br /><br />
+
+        <!-- Textarea für die Problembeschreibung -->
+        <label for="ticket_description">Problem Description:</label><br />
+        <textarea id="ticket_description" name="ticket_description" rows="5" cols="50"
+                  placeholder="Describe your issue here...">{{ ticket_description or '' }}</textarea>
+
+        <br /><br />
+        <button type="submit">Submit Ticket</button>
+    </form>
+
+    <!-- Falls das Modell eine andere Kategorie vermutet, erscheint dieser Hinweis -->
+    {% if mismatch %}
+        <hr />
+        <p style="color: red;">
+            <strong>Attention!</strong> Based on your description, the model suggests:
+            <em>{{ predicted_category }}</em>,
+            but you selected <em>{{ chosen_category }}</em>.
+        </p>
+        <!-- Hier die beiden Buttons: "Change" oder "Proceed anyway" -->
+        <button onclick="alert('Please adjust your description or the category if necessary.')">
+            Change
+        </button>
+        <button onclick="alert('The ticket will be forwarded with your chosen category: {{ chosen_category }}')">
+            Proceed Anyway
+        </button>
+    {% endif %}
+</body>
+</html>

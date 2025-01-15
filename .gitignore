@@ -1,0 +1,5 @@
+survey_results.csv
+requirements.txt
+build/
+dist/
+app.spec

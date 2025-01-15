@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Survey</title>
+</head>
+<body>
+    <h1>Survey</h1>
+    <p>We appreciate your feedback. Please fill out the form below:</p>
+
+    <form method="POST" action="{{ url_for('survey') }}">
+        <label for="user_name">Your Name:</label><br />
+        <input type="text" id="user_name" name="user_name" /><br /><br />
+
+        <label for="satisfaction">How satisfied are you (1=low, 5=high)?</label><br />
+        <select id="satisfaction" name="satisfaction">
+            <option value="1">1 - not satisfied</option>
+            <option value="2">2</option>
+            <option value="3">3 - neutral</option>
+            <option value="4">4</option>
+            <option value="5">5 - very satisfied</option>
+        </select>
+        <br /><br />
+
+        <label for="comments">Additional Comments:</label><br />
+        <textarea id="comments" name="comments" rows="5" cols="50"></textarea>
+        <br /><br />
+
+        <button type="submit">Submit Survey</button>
+    </form>
+</body>
+</html>

@@ -6,6 +6,8 @@
 </head>
 <body>
     <h1>Ticket Submission</h1>
+
+    <!-- ticket page -->
     <form method="POST" action="/">
         <!-- Dropdown für die Kategorie-Auswahl -->
         <label for="chosen_category">Select Category:</label><br />
@@ -19,30 +21,50 @@
         </select>
         <br /><br />
 
-        <!-- Textarea für die Problembeschreibung -->
+        <!-- Textarea für die Problem-Beschreibung -->
         <label for="ticket_description">Problem Description:</label><br />
-        <textarea id="ticket_description" name="ticket_description" rows="5" cols="50"
-                  placeholder="Describe your issue here...">{{ ticket_description or '' }}</textarea>
-
+        <textarea id="ticket_description" name="ticket_description"
+                  rows="5" cols="50"
+                  placeholder="Beschreibe dein Problem hier...">{{ ticket_description or '' }}</textarea>
         <br /><br />
+
         <button type="submit">Submit Ticket</button>
     </form>
+
+    <!-- Deine Schritt-für-Schritt-Anleitung unter dem Formular -->
+    <hr />
+    <div style="border: 1px dashed #666; padding: 10px;">
+        <p><strong>Instructions:</strong></p>
+        <p>1. Choose a Category</p>
+        <p>2. Write your ticket</p>
+        <p>3. Submit it</p>
+        <p>4. If you encounter the "error message" please click on "Change" or "Proceed anyway".</p>
+        <p>5. If you click on "Proceed anyway" you will be forwarded to the survey page.</p>
+    </div>
 
     <!-- Falls das Modell eine andere Kategorie vermutet, erscheint dieser Hinweis -->
     {% if mismatch %}
         <hr />
         <p style="color: red;">
-            <strong>Attention!</strong> Based on your description, the model suggests:
+            <strong>Error!</strong> Our system thinks your ticket matches the category:
             <em>{{ predicted_category }}</em>,
             but you selected <em>{{ chosen_category }}</em>.
         </p>
-        <!-- Hier die beiden Buttons: "Change" oder "Proceed anyway" -->
-        <button onclick="alert('Please adjust your description or the category if necessary.')">
-            Change
-        </button>
-        <button onclick="alert('The ticket will be forwarded with your chosen category: {{ chosen_category }}')">
-            Proceed Anyway
-        </button>
+
+        <!-- Buttons: "Change" oder "Proceed anyway" -->
+        <!-- 1) CHANGE-FORMULAR: Schickt POST an "/", setzt chosen_category auf predicted_category -->
+        <form method="POST" action="/" style="display: inline;">
+            <!-- versteckte Felder -->
+            <input type="hidden" name="ticket_description" value="{{ ticket_description }}">
+            <input type="hidden" name="chosen_category" value="{{ predicted_category }}">
+            <input type="hidden" name="change_category" value="true">
+            <button type="submit">Change</button>
+        </form>
+
+        <!-- 2) PROCEED ANYWAY: Leitet per GET auf /survey -->
+        <form action="{{ url_for('survey') }}" method="get" style="display: inline;">
+            <button type="submit">Proceed anyway</button>
+        </form>
     {% endif %}
 </body>
 </html>

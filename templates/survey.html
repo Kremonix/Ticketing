@@ -6,8 +6,9 @@
 </head>
 <body>
     <h1>Survey</h1>
-    <p>We appreciate your feedback. Please fill out the form below:</p>
-
+    {% if feedback %}
+        <p style="color: green;">{{ feedback }}</p>
+    {% endif %}
     <form method="POST" action="{{ url_for('survey') }}">
         <label for="user_name">Your Name:</label><br />
         <input type="text" id="user_name" name="user_name" /><br /><br />

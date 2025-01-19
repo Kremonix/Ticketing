@@ -5,26 +5,127 @@
     <title>Survey</title>
 </head>
 <body>
-    <h1>Survey</h1>
-    {% if feedback %}
-        <p style="color: green;">{{ feedback }}</p>
-    {% endif %}
-    <form method="POST" action="{{ url_for('survey') }}">
-        <label for="user_name">Your Name:</label><br />
-        <input type="text" id="user_name" name="user_name" /><br /><br />
+    <h1>Ticket Submission System - User Feedback Survey</h1>
+    <p>We appreciate your feedback. Please answer the following questions:</p>
 
-        <label for="satisfaction">How satisfied are you (1=low, 5=high)?</label><br />
-        <select id="satisfaction" name="satisfaction">
-            <option value="1">1 - not satisfied</option>
-            <option value="2">2</option>
-            <option value="3">3 - neutral</option>
-            <option value="4">4</option>
-            <option value="5">5 - very satisfied</option>
+    <form method="POST" action="{{ url_for('survey') }}">
+        <label for="experience">How would you rate your overall experience with the ticket submission form?</label><br />
+        <select id="experience" name="experience">
+            <option value="1">⭐️ (1 - Poor)</option>
+            <option value="2">⭐️⭐️ (2 - Fair)</option>
+            <option value="3">⭐️⭐️⭐️ (3 - Average)</option>
+            <option value="4">⭐️⭐️⭐️⭐️ (4 - Good)</option>
+            <option value="5">⭐️⭐️⭐️⭐️⭐️ (5 - Excellent)</option>
         </select>
         <br /><br />
 
-        <label for="comments">Additional Comments:</label><br />
-        <textarea id="comments" name="comments" rows="5" cols="50"></textarea>
+        <label for="intuitive">How intuitive was the process of submitting a ticket?</label><br />
+        <select id="intuitive" name="intuitive">
+            <option value="Very intuitive">Very intuitive</option>
+            <option value="Somewhat intuitive">Somewhat intuitive</option>
+            <option value="Neutral">Neutral</option>
+            <option value="Somewhat confusing">Somewhat confusing</option>
+            <option value="Very confusing">Very confusing</option>
+        </select>
+        <br /><br />
+
+        <label for="prediction_effectiveness">How effective was the system’s category prediction feature in routing your ticket correctly?</label><br />
+        <select id="prediction_effectiveness" name="prediction_effectiveness">
+            <option value="Very effective">Very effective</option>
+            <option value="Moderately effective">Moderately effective</option>
+            <option value="Not effective">Not effective</option>
+            <option value="I did not use this feature">I did not use this feature</option>
+        </select>
+        <br /><br />
+
+        <label for="prediction_inaccuracy">If the category prediction was inaccurate, what improvements do you suggest?</label><br />
+        <textarea id="prediction_inaccuracy" name="prediction_inaccuracy" rows="3" cols="50"></textarea>
+        <br /><br />
+
+        <label for="category_accuracy">How would you rate the accuracy of the suggested category for your ticket?</label><br />
+        <select id="category_accuracy" name="category_accuracy">
+            <option value="Perfectly matched my needs">Perfectly matched my needs</option>
+            <option value="Somewhat relevant">Somewhat relevant</option>
+            <option value="Not relevant at all">Not relevant at all</option>
+            <option value="I chose to override the suggestion">I chose to override the suggestion</option>
+        </select>
+        <br /><br />
+
+        <label for="problem_description">How easy was it to describe your problem in the description field?</label><br />
+        <select id="problem_description" name="problem_description">
+            <option value="Very easy">Very easy</option>
+            <option value="Easy">Easy</option>
+            <option value="Neutral">Neutral</option>
+            <option value="Difficult">Difficult</option>
+            <option value="Very difficult">Very difficult</option>
+        </select>
+        <br /><br />
+
+        <label for="missing_fields">Did you find all necessary fields and options to describe your issue comprehensively?</label><br />
+        <select id="missing_fields" name="missing_fields">
+            <option value="Yes">Yes</option>
+            <option value="No">No (Please specify below)</option>
+        </select>
+        <br /><br />
+        <textarea id="missing_fields_details" name="missing_fields_details" rows="2" cols="50" placeholder="If no, specify what was missing"></textarea>
+        <br /><br />
+
+        <label for="submission_time">How much time did it take you to submit your ticket?</label><br />
+        <select id="submission_time" name="submission_time">
+            <option value="Less than 2 minutes">Less than 2 minutes</option>
+            <option value="2–5 minutes">2–5 minutes</option>
+            <option value="5–10 minutes">5–10 minutes</option>
+            <option value="More than 10 minutes">More than 10 minutes</option>
+        </select>
+        <br /><br />
+
+        <label for="response_time">What was your experience with the response time of the system to your inputs (e.g., loading speed, dropdown updates)?</label><br />
+        <select id="response_time" name="response_time">
+            <option value="Very fast">Very fast</option>
+            <option value="Fast">Fast</option>
+            <option value="Average">Average</option>
+            <option value="Slow">Slow</option>
+            <option value="Very slow">Very slow</option>
+        </select>
+        <br /><br />
+
+        <label for="enhancements">What changes would enhance your experience with the ticket submission form? (Select all that apply)</label><br />
+        <input type="checkbox" name="enhancements" value="More category options"> More category options<br />
+        <input type="checkbox" name="enhancements" value="Better category descriptions"> Better category descriptions<br />
+        <input type="checkbox" name="enhancements" value="Clearer instructions"> Clearer instructions<br />
+        <input type="checkbox" name="enhancements" value="Simpler interface"> Simpler interface<br />
+        <input type="checkbox" name="enhancements" value="Additional fields for detailed input"> Additional fields for detailed input<br />
+        <input type="checkbox" name="enhancements" value="Faster response time"> Faster response time<br />
+        <input type="checkbox" name="enhancements" value="Other"> Other (Please specify below)<br />
+        <textarea id="enhancements_details" name="enhancements_details" rows="2" cols="50"></textarea>
+        <br /><br />
+
+        <label for="additional_features">Would you recommend any additional features for this ticket submission system?</label><br />
+        <textarea id="additional_features" name="additional_features" rows="3" cols="50"></textarea>
+        <br /><br />
+
+        <label for="reuse_likelihood">On a scale of 1–5, how likely are you to use this ticket submission system again?</label><br />
+        <select id="reuse_likelihood" name="reuse_likelihood">
+            <option value="1">1 (Not likely at all)</option>
+            <option value="2">2 (Somewhat unlikely)</option>
+            <option value="3">3 (Neutral)</option>
+            <option value="4">4 (Likely)</option>
+            <option value="5">5 (Very likely)</option>
+        </select>
+        <br /><br />
+
+        <label for="necessary_information">Did the system preemptively ask for all the necessary information required to resolve your ticket?</label><br />
+        <select id="necessary_information" name="necessary_information">
+            <option value="Yes">Yes, it asked for everything needed.</option>
+            <option value="No">No, additional information was requested later (Please specify below).</option>
+            <option value="Unsure">Unsure</option>
+        </select>
+        <br /><br />
+        <textarea id="necessary_information_details" name="necessary_information_details" rows="2" cols="50"></textarea>
+        <br /><br />
+
+        <label for="additional_comments">Additional comments or suggestions:</label><br />
+        <textarea id="additional_comments" name="additional_comments" rows="3" cols="50"></textarea>
         <br /><br />
 
         <button type="submit">Submit Survey</button>

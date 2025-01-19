@@ -7,8 +7,8 @@
 <body>
     <h1>Ticket Submission</h1>
 
-    <!-- Ticket-Formular -->
-    <form method="POST" action="/">
+    <!-- Ticket Form -->
+    <form method="POST" action="/tickets">
         <label for="chosen_category">Select Category:</label><br />
         <select id="chosen_category" name="chosen_category">
             {% for cat in categories %}
@@ -26,29 +26,36 @@
         <button type="submit">Submit Ticket</button>
     </form>
 
-    <!-- Erfolgsmeldung -->
+    <!-- Success Message -->
     {% if success %}
         <p style="color: green; margin-top: 20px;">
             Success! The algorithm confirmed your chosen category '{{ chosen_category }}'.
         </p>
-        <form action="{{ url_for('survey') }}" method="get">
+        <form action="/survey" method="get">
             <button type="submit">Proceed to Survey</button>
         </form>
     {% endif %}
 
-    <!-- Warnung bei Nichtübereinstimmung -->
+    <!-- Warning and Buttons in Case of Mismatch -->
     {% if mismatch %}
         <p style="color: red;">
-            Warning: The algorithm suggests the category '{{ predicted_category }}'.
+            Warning: The algorithm suggests the category '{{ predicted_category }}',
+            but you selected '{{ chosen_category }}'.
         </p>
-        <form action="/" method="post" style="display: inline;">
+        <!-- Change Button -->
+        <form method="POST" action="/tickets" style="display: inline;">
             <input type="hidden" name="ticket_description" value="{{ ticket_description }}">
             <input type="hidden" name="chosen_category" value="{{ predicted_category }}">
             <input type="hidden" name="change_category" value="true">
-            <button type="submit">Change</button>
+            <button type="submit" style="background-color: orange; color: white; padding: 10px; border: none; cursor: pointer;">
+                Change to Suggested Category
+            </button>
         </form>
-        <form action="{{ url_for('survey') }}" method="get" style="display: inline;">
-            <button type="submit">Proceed Anyway</button>
+        <!-- Proceed Anyway Button -->
+        <form action="/survey" method="get" style="display: inline;">
+            <button type="submit" style="background-color: grey; color: white; padding: 10px; border: none; cursor: pointer;">
+                Proceed Anyway
+            </button>
         </form>
     {% endif %}
 </body>

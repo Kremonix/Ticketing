@@ -5,11 +5,11 @@ import os
 
 app = Flask(__name__)
 
-# Das zuvor trainierte Modell und den Vectorizer laden
+# Load the trained model and vectorizer
 svm_model = joblib.load("svm_model.pkl")
 vectorizer = joblib.load("tfidf_vectorizer.pkl")
 
-# Kategorien
+# Categories
 CATEGORIES = [
     "Hardware",
     "HR Support",
@@ -21,8 +21,25 @@ CATEGORIES = [
     "Administrative rights"
 ]
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/")
+def home():
+    """
+    Redirects to the intro page.
+    """
+    return redirect(url_for("intro"))
+
+@app.route("/intro", methods=["GET"])
+def intro():
+    """
+    Displays the introduction page for the experiment.
+    """
+    return render_template("intro.html")
+
+@app.route("/tickets", methods=["GET", "POST"])
 def index():
+    """
+    Handles ticket submission and category evaluation.
+    """
     chosen_category = None
     predicted_category = None
     ticket_description = None
@@ -30,18 +47,26 @@ def index():
     success = False
 
     if request.method == "POST":
-        chosen_category = request.form.get("chosen_category")
-        ticket_description = request.form.get("ticket_description", "").strip()
-
-        # Beschreibung mit TF-IDF vektorisieren
-        text_vector = vectorizer.transform([ticket_description])
-        predicted_category = svm_model.predict(text_vector)[0]
-
-        # Kategorien vergleichen
-        if predicted_category == chosen_category:
-            success = True
+        # Check if the user clicked the "Change" button
+        if request.form.get("change_category"):
+            # Update chosen_category to the predicted one
+            chosen_category = request.form.get("chosen_category")
+            ticket_description = request.form.get("ticket_description")
+            success = True  # Assume success since the suggested category is now chosen
         else:
-            mismatch = True
+            # Regular submission logic
+            chosen_category = request.form.get("chosen_category")
+            ticket_description = request.form.get("ticket_description", "").strip()
+
+            # Vectorize the description and predict the category
+            text_vector = vectorizer.transform([ticket_description])
+            predicted_category = svm_model.predict(text_vector)[0]
+
+            # Check for mismatch
+            if predicted_category == chosen_category:
+                success = True
+            else:
+                mismatch = True
 
     return render_template(
         "index.html",
@@ -55,8 +80,11 @@ def index():
 
 @app.route("/survey", methods=["GET", "POST"])
 def survey():
+    """
+    Displays a survey page (GET) and saves the results (POST).
+    """
     if request.method == "POST":
-        # Liste aller Formularfelder (basierend auf `survey.html`)
+        # List of all form fields in survey.html
         fields = [
             "experience",
             "intuitive",
@@ -77,28 +105,29 @@ def survey():
             "additional_comments"
         ]
 
-        # Erfasse alle Eingaben aus dem Formular
+        # Capture all inputs from the form
         survey_data = {field: request.form.get(field, "") for field in fields}
 
-        # Verbesserungen (Checkboxes) als Liste erfassen
+        # Handle multiple selections for enhancements
         survey_data["enhancements"] = request.form.getlist("enhancements")
 
-        # CSV-Datei öffnen oder erstellen
+        # Save data to CSV
         file_exists = os.path.isfile("survey_results.csv")
         with open("survey_results.csv", "a", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
 
-            # Header schreiben, falls die Datei neu ist
+            # Write header if file is new
             if not file_exists:
                 writer.writerow(fields)
 
-            # Daten schreiben
+            # Write data row
             writer.writerow([survey_data[field] for field in fields])
 
-        # Nach dem Speichern -> Danke-Seite anzeigen
+        # Redirect to thank you page after submission
         return render_template("thank_you.html")
 
     return render_template("survey.html")
+
 
 if __name__ == "__main__":
     app.run(debug=True)

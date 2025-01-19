@@ -23,16 +23,11 @@ CATEGORIES = [
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    """
-    Zeigt ein Formular zum Einreichen eines Tickets.
-    Beim POST wird der Text klassifiziert und mit der
-    ausgewählten Kategorie verglichen.
-    """
     chosen_category = None
     predicted_category = None
     ticket_description = None
     mismatch = False
-    success = False  # Erfolgsmeldung
+    success = False
 
     if request.method == "POST":
         chosen_category = request.form.get("chosen_category")
@@ -40,14 +35,13 @@ def index():
 
         # Beschreibung mit TF-IDF vektorisieren
         text_vector = vectorizer.transform([ticket_description])
-        # Vorhersage treffen
         predicted_category = svm_model.predict(text_vector)[0]
 
         # Kategorien vergleichen
         if predicted_category == chosen_category:
-            success = True  # Erfolgsmeldung anzeigen
+            success = True
         else:
-            mismatch = True  # Fehlermeldung anzeigen
+            mismatch = True
 
     return render_template(
         "index.html",
@@ -61,27 +55,49 @@ def index():
 
 @app.route("/survey", methods=["GET", "POST"])
 def survey():
-    """
-    Zeigt eine Umfrage-Seite (GET) und speichert die Ergebnisse (POST).
-    """
     if request.method == "POST":
-        # Felder aus dem Survey-Formular
-        user_name = request.form.get("user_name", "")
-        satisfaction = request.form.get("satisfaction", "")
-        comments = request.form.get("comments", "")
+        # Liste aller Formularfelder (basierend auf `survey.html`)
+        fields = [
+            "experience",
+            "intuitive",
+            "prediction_effectiveness",
+            "prediction_inaccuracy",
+            "category_accuracy",
+            "problem_description",
+            "missing_fields",
+            "missing_fields_details",
+            "submission_time",
+            "response_time",
+            "enhancements",
+            "enhancements_details",
+            "additional_features",
+            "reuse_likelihood",
+            "necessary_information",
+            "necessary_information_details",
+            "additional_comments"
+        ]
 
-        # Survey-Daten speichern
+        # Erfasse alle Eingaben aus dem Formular
+        survey_data = {field: request.form.get(field, "") for field in fields}
+
+        # Verbesserungen (Checkboxes) als Liste erfassen
+        survey_data["enhancements"] = request.form.getlist("enhancements")
+
+        # CSV-Datei öffnen oder erstellen
         file_exists = os.path.isfile("survey_results.csv")
         with open("survey_results.csv", "a", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
+
+            # Header schreiben, falls die Datei neu ist
             if not file_exists:
-                writer.writerow(["user_name", "satisfaction", "comments"])
-            writer.writerow([user_name, satisfaction, comments])
+                writer.writerow(fields)
 
-        # Nach dem Speichern -> "thank_you.html"
-        return render_template("thank_you.html", user_name=user_name)
+            # Daten schreiben
+            writer.writerow([survey_data[field] for field in fields])
 
-    # GET-Request: Zeige das Umfrage-Formular
+        # Nach dem Speichern -> Danke-Seite anzeigen
+        return render_template("thank_you.html")
+
     return render_template("survey.html")
 
 if __name__ == "__main__":

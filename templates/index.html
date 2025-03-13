@@ -31,8 +31,12 @@
         <p style="color: green; margin-top: 20px;">
             Success! The algorithm confirmed your chosen category '{{ chosen_category }}'.
         </p>
-        <form action="/survey" method="get">
-            <button type="submit">Proceed to Survey</button>
+        <!-- "Finish Simulation" Button, der das Ticket speichert -->
+        <form action="/thank_you" method="get">
+            <input type="hidden" name="ticket_description" value="{{ ticket_description }}">
+            <input type="hidden" name="chosen_category" value="{{ chosen_category }}">
+            <input type="hidden" name="predicted_category" value="{{ predicted_category }}">
+            <button type="submit">Finish Simulation</button>
         </form>
     {% endif %}
 
@@ -51,8 +55,11 @@
                 Change to Suggested Category
             </button>
         </form>
-        <!-- Proceed Anyway Button -->
-        <form action="/survey" method="get" style="display: inline;">
+        <!-- Proceed Anyway Button (führt zur Speicherung beim Abschluss) -->
+        <form action="/thank_you" method="get" style="display: inline;">
+            <input type="hidden" name="ticket_description" value="{{ ticket_description }}">
+            <input type="hidden" name="chosen_category" value="{{ chosen_category }}">
+            <input type="hidden" name="predicted_category" value="{{ predicted_category }}">
             <button type="submit" style="background-color: grey; color: white; padding: 10px; border: none; cursor: pointer;">
                 Proceed Anyway
             </button>

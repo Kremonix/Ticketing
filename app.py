@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for
 import joblib
 import csv
 import os
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -21,25 +22,19 @@ CATEGORIES = [
     "Administrative rights"
 ]
 
+# CSV-Dateipfad
+CSV_FILE = "simulation_results.csv"
+
 @app.route("/")
 def home():
-    """
-    Redirects to the intro page.
-    """
     return redirect(url_for("intro"))
 
 @app.route("/intro", methods=["GET"])
 def intro():
-    """
-    Displays the introduction page for the experiment.
-    """
     return render_template("intro.html")
 
 @app.route("/tickets", methods=["GET", "POST"])
 def index():
-    """
-    Handles ticket submission and category evaluation.
-    """
     chosen_category = None
     predicted_category = None
     ticket_description = None
@@ -47,22 +42,16 @@ def index():
     success = False
 
     if request.method == "POST":
-        # Check if the user clicked the "Change" button
         if request.form.get("change_category"):
-            # Update chosen_category to the predicted one
             chosen_category = request.form.get("chosen_category")
             ticket_description = request.form.get("ticket_description")
-            success = True  # Assume success since the suggested category is now chosen
+            success = True  
         else:
-            # Regular submission logic
             chosen_category = request.form.get("chosen_category")
             ticket_description = request.form.get("ticket_description", "").strip()
-
-            # Vectorize the description and predict the category
             text_vector = vectorizer.transform([ticket_description])
             predicted_category = svm_model.predict(text_vector)[0]
 
-            # Check for mismatch
             if predicted_category == chosen_category:
                 success = True
             else:
@@ -78,56 +67,33 @@ def index():
         ticket_description=ticket_description
     )
 
-@app.route("/survey", methods=["GET", "POST"])
-def survey():
+@app.route("/thank_you", methods=["GET"])
+def thank_you():
     """
-    Displays a survey page (GET) and saves the results (POST).
+    Speichert das Ticket erst, wenn der Nutzer auf "Finish Simulation" klickt.
     """
-    if request.method == "POST":
-        # List of all form fields in survey.html
-        fields = [
-            "experience",
-            "intuitive",
-            "prediction_effectiveness",
-            "prediction_inaccuracy",
-            "category_accuracy",
-            "problem_description",
-            "missing_fields",
-            "missing_fields_details",
-            "submission_time",
-            "response_time",
-            "enhancements",
-            "enhancements_details",
-            "additional_features",
-            "reuse_likelihood",
-            "necessary_information",
-            "necessary_information_details",
-            "additional_comments"
-        ]
+    ticket_description = request.args.get("ticket_description", "")
+    chosen_category = request.args.get("chosen_category", "")
+    predicted_category = request.args.get("predicted_category", "")
 
-        # Capture all inputs from the form
-        survey_data = {field: request.form.get(field, "") for field in fields}
+    if ticket_description and chosen_category:
+        save_ticket_to_csv(ticket_description, chosen_category, predicted_category)
 
-        # Handle multiple selections for enhancements
-        survey_data["enhancements"] = request.form.getlist("enhancements")
+    return render_template("thank_you.html")
 
-        # Save data to CSV
-        file_exists = os.path.isfile("survey_results.csv")
-        with open("survey_results.csv", "a", newline="", encoding="utf-8") as f:
-            writer = csv.writer(f)
-
-            # Write header if file is new
-            if not file_exists:
-                writer.writerow(fields)
-
-            # Write data row
-            writer.writerow([survey_data[field] for field in fields])
-
-        # Redirect to thank you page after submission
-        return render_template("thank_you.html")
-
-    return render_template("survey.html")
-
+def save_ticket_to_csv(ticket_description, chosen_category, predicted_category):
+    file_exists = os.path.isfile(CSV_FILE)
+    
+    with open(CSV_FILE, "a", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        if not file_exists:
+            writer.writerow(["Timestamp", "Ticket Description", "Chosen Category", "Predicted Category"])
+        writer.writerow([
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            ticket_description,
+            chosen_category,
+            predicted_category
+        ])
 
 if __name__ == "__main__":
     app.run(debug=True)
